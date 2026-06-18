@@ -13,9 +13,11 @@
 
 GitHub 远程同步未完成。当前工具状态下：
 
-- GitHub App 没有安装账号。
+- GitHub App 已能看到账号 `Tom-20201006`。
 - GitHub App 没有可访问仓库。
+- GitHub 插件当前没有创建新仓库工具。
 - 本机没有 GitHub CLI `gh`。
+- 本地 remote 已设置为 `https://github.com/Tom-20201006/virtual-antinet-box.git`，但该仓库当前不存在。
 
 ## 上一轮最重要变化
 
@@ -25,8 +27,8 @@ GitHub 远程同步未完成。当前工具状态下：
 
 ## 下一步可能方向
 
-1. 用户授权 GitHub 连接器或安装并登录 `gh`。
-2. Codex 创建或连接 GitHub 仓库并 push 本地 commit。
+1. 用户手动创建空仓库 `Tom-20201006/virtual-antinet-box`，或安装并登录 `gh`。
+2. Codex push 本地 commit。
 3. iOS ChatGPT 读取 GitHub 最新状态。
 4. iOS ChatGPT 写入第一个正式 CMD 命令。
 
@@ -39,6 +41,6 @@ GitHub 远程同步未完成。当前工具状态下：
 
 ## 需要用户确认的问题
 
-1. 要使用哪个 GitHub 账号或组织创建仓库？
-2. 远程仓库名称是否使用 `virtual-antinet-box`？
-3. 仓库应为 public 还是 private？
+1. 仓库应为 public 还是 private？
+2. 是否确认远程仓库名使用 `virtual-antinet-box`？
+3. 是否希望改用其他仓库 URL？
