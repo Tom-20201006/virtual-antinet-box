@@ -1,0 +1,7 @@
+{
+  "note": "Runtime saves are written to Godot user://world_state.json. This placeholder documents the project-local state shape only.",
+  "version": 1,
+  "principle": "physical_state_and_resource_paths_only",
+  "cards": [],
+  "drawers": []
+}
