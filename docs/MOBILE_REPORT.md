@@ -22,16 +22,17 @@
 - 自动检查通过。
 - 用户人工交互验收已完成。
 - 用户报告验收结果：一切正常。
+- 人工验收结果已同步到 `docs/USER_ACCEPTANCE_LOG.md` 和 `docs/BUG_REPORT.md`。
 
-## 主要修改文件
+## 主要更新文件
 
-- `docs/COMMAND_QUEUE.md`
 - `docs/MOBILE_REPORT.md`
-- `docs/EXECUTION_LOG.md`
 - `docs/PROJECT_STATE.md`
 - `docs/NEXT_REVIEW.md`
 - `docs/BUG_REPORT.md`
-- `docs/ACCEPTANCE.md`
+- `docs/USER_ACCEPTANCE_LOG.md`
+
+说明：`docs/ACCEPTANCE.md` 直接更新曾被连接器安全检查拦截，因此本次新增独立验收记录文件 `docs/USER_ACCEPTANCE_LOG.md` 作为人工验收事实记录。
 
 ## 自动检查结果
 
