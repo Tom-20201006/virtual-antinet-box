@@ -11,26 +11,27 @@
 
 ## 当前最重要的问题
 
-GitHub 远程同步未完成。当前工具状态下：
+GitHub 远程同步已完成。当前状态：
 
-- GitHub App 已能看到账号 `Tom-20201006`。
-- GitHub App 没有可访问仓库。
-- GitHub 插件当前没有创建新仓库工具。
-- 本机没有 GitHub CLI `gh`。
-- 本地 remote 已设置为 `https://github.com/Tom-20201006/virtual-antinet-box.git`，但该仓库当前不存在。
+- 仓库：`Tom-20201006/virtual-antinet-box`
+- remote：`https://github.com/Tom-20201006/virtual-antinet-box.git`
+- 本地分支：`main`
+- 远程分支：`origin/main`
+- 首次 push 已成功。
 
 ## 上一轮最重要变化
 
 - 已建立协作结构文档。
 - 已将 `docs/COMMAND_QUEUE.md` 设为主命令入口。
 - 已创建 `AGENTS.md`，规定 Codex 每轮开始、执行、完成、提交、推送和记录规则。
+- 已完成 GitHub 仓库首次同步。
 
 ## 下一步可能方向
 
-1. 用户手动创建空仓库 `Tom-20201006/virtual-antinet-box`，或安装并登录 `gh`。
-2. Codex push 本地 commit。
-3. iOS ChatGPT 读取 GitHub 最新状态。
-4. iOS ChatGPT 写入第一个正式 CMD 命令。
+1. iOS ChatGPT 读取 GitHub 最新状态。
+2. iOS ChatGPT 写入第一个正式 CMD 命令到 `docs/COMMAND_QUEUE.md`。
+3. 用户通过 UU 远程触发 Codex 执行指定 CMD。
+4. Codex 执行、验证、更新文档、commit 并 push。
 
 ## 不要重复讨论
 
@@ -41,6 +42,5 @@ GitHub 远程同步未完成。当前工具状态下：
 
 ## 需要用户确认的问题
 
-1. 仓库应为 public 还是 private？
-2. 是否确认远程仓库名使用 `virtual-antinet-box`？
-3. 是否希望改用其他仓库 URL？
+1. 第一个正式 CMD 要优先处理哪个方向：交互完善、导入流程、性能结构，还是验收测试？
+2. 是否需要把仓库 visibility 从 public 调整为 private？
