@@ -18,7 +18,7 @@
 - 创建 `docs/COMMAND_QUEUE.md`，作为 iOS ChatGPT 直接写入命令的主入口。
 - 创建项目状态、移动端报告、执行日志、决策日志、测试、验收、Bug、下一轮审查等协作文档。
 - README 已更新，指向关键协作文档。
-- 本地 Git 仓库已初始化，本轮将创建本地 commit。
+- 本地 Git 仓库已初始化，本地 commit 已完成。
 
 ## 主要修改文件
 
@@ -51,7 +51,7 @@ GitHub 仓库创建和 push 当前无法完成，因为：
 2. GitHub App 当前返回 repositories 为空。
 3. 本机未检测到 GitHub CLI `gh`。
 
-本地 commit 状态：本轮结束前会提交到本地 `main` 分支；GitHub push 当前阻塞。
+本地 commit 状态：已提交到本地 `main` 分支。GitHub push 当前阻塞。
 
 ## 需要用户人工处理
 

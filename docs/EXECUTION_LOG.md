@@ -40,6 +40,7 @@
 - 检查 `gh`：未检测到 GitHub CLI。
 - 执行 Godot headless 主场景加载：通过。
 - 初始化本地 Git 仓库：通过。
+- 创建本地 commit：通过。
 
 ### 测试结果
 
@@ -68,4 +69,4 @@ GitHub 创建仓库和 push 当前无法完成。原因：
 
 ### commit 信息
 
-本地 commit 将在文档写入和 diff 检查后创建到 `main` 分支。GitHub push 当前阻塞。
+本地 commit 已创建到 `main` 分支。GitHub push 当前阻塞。
