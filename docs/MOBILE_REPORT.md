@@ -1,62 +1,66 @@
 # Mobile Report
 
-最近更新时间：2026-06-18 20:05 +08:00
+最近更新时间：2026-06-18 20:27 +08:00
 
 ## 当前总体状态
 
-本地协作结构已建立，GitHub 仓库已创建并完成首次 push。GitHub 现在是项目事实来源。
+`CMD-2026-06-18-001` 已完成。第一次正式协作闭环验证通过：iOS ChatGPT 写入命令，Codex 同步 GitHub、读取指定 CMD、执行文档状态清理、运行自动检查，并准备提交推送结果。
 
 ## 最近一次执行命令
 
-启动任务：协作结构初始化。
+命令：`CMD-2026-06-18-001`
 
-状态：DONE / PUSHED
+状态：DONE
 
 ## 本轮完成内容
 
-- 创建 `AGENTS.md`，定义 Codex 每轮执行规则。
-- 创建 `docs/COMMAND_QUEUE.md`，作为 iOS ChatGPT 直接写入命令的主入口。
-- 创建项目状态、移动端报告、执行日志、决策日志、测试、验收、Bug、下一轮审查等协作文档。
-- README 已更新，指向关键协作文档。
-- 本地 Git 仓库已初始化，本地 commit 已完成。
-- 已确认 GitHub 仓库 `Tom-20201006/virtual-antinet-box` 存在。
-- 已设置 remote：`https://github.com/Tom-20201006/virtual-antinet-box.git`。
-- 已成功 push 本地 `main` 到 `origin/main`。
-- 已建立本地 `main` 对 `origin/main` 的 tracking。
+- 已同步 GitHub 最新 `origin/main`。
+- 已读取 `AGENTS.md` 和 `docs/COMMAND_QUEUE.md`。
+- 只执行 `CMD-2026-06-18-001`，没有扩展到功能开发。
+- 已清理 `docs/COMMAND_QUEUE.md` 中 `BOOTSTRAP-2026-06-18` 的过期阻塞状态。
+- 已统一核心文档中的 GitHub 同步状态。
+- 已明确区分自动检查和用户人工交互验收。
 
 ## 主要修改文件
 
-- `AGENTS.md`
-- `README.md`
-- `docs/COLLABORATION_WORKFLOW.md`
 - `docs/COMMAND_QUEUE.md`
-- `docs/PROJECT_STATE.md`
 - `docs/MOBILE_REPORT.md`
 - `docs/EXECUTION_LOG.md`
-- `docs/DECISION_LOG.md`
-- `docs/TESTING.md`
-- `docs/ACCEPTANCE.md`
-- `docs/BUG_REPORT.md`
+- `docs/PROJECT_STATE.md`
 - `docs/NEXT_REVIEW.md`
 
-## 测试结果
+## 自动检查结果
 
-- 已执行 `git status -sb`：当前分支 `main`，工作区 clean。
-- 已执行 `git remote -v`：`origin` 指向 `https://github.com/Tom-20201006/virtual-antinet-box.git`。
-- GitHub App 已确认仓库存在，权限包含 push。
-- 已成功执行 `git push -u origin main`。
-- Godot headless 主场景加载验证曾通过。
+- `git status -sb`：通过，输出 `## main...origin/main`。
+- `git remote -v`：通过，`origin` 指向 `https://github.com/Tom-20201006/virtual-antinet-box.git`。
+- Godot headless 加载：通过，Godot 4.6.3 能加载项目，无脚本解析错误。
 
-## 仍存在问题
+## 人工验收状态
 
-无当前 GitHub 同步阻塞。
+Codex 没有执行人工交互验收。Godot headless 检查只是自动预检查，不等同于功能体验验收。
 
-本地 commit 状态：已提交到本地 `main` 分支，并已推送到 `origin/main`。
+用户仍需通过 UU 远程打开 Godot，按 `docs/validation.md` 逐项测试：
 
-## 需要用户人工处理
+- 抽屉开合。
+- 卡片选中。
+- 卡片拿起和移动。
+- 卡片旋转和翻面。
+- 卡片放入抽屉。
+- 卡片从抽屉取出。
+- 本地图片导入。
+- 世界状态保存。
+- 世界状态加载。
+- 摄像机控制。
+- 最低限度数字化边界检查。
 
-需要用户通过 GitHub 页面或 iOS ChatGPT 确认仓库内容可见。
+## GitHub 状态
+
+- 仓库：`Tom-20201006/virtual-antinet-box`
+- remote：`https://github.com/Tom-20201006/virtual-antinet-box.git`
+- 当前同步阻塞：无
+- 本轮提交信息包含：`CMD-2026-06-18-001`
+- push 状态：本轮文档更新提交后推送到 GitHub
 
 ## 下一步建议
 
-下一轮开始时，Codex 应先同步 GitHub 最新内容，读取 `AGENTS.md` 和 `docs/COMMAND_QUEUE.md`，再执行用户指定 CMD 编号。
+用户通过 UU 远程完成 `docs/validation.md` 的人工验收后，再由 iOS ChatGPT 写入下一个正式 CMD。

@@ -174,3 +174,94 @@ To https://github.com/Tom-20201006/virtual-antinet-box.git
 ### 下一步建议
 
 文档更新推送完成后，iOS ChatGPT 可以从 GitHub 读取最新状态，并写入第一个正式 CMD 命令。
+
+## 2026-06-18 20:27 +08:00
+
+执行命令编号：CMD-2026-06-18-001
+
+操作者：Codex Desktop App
+
+状态：DONE
+
+### 任务
+
+完成新协作结构的第一次正式闭环验证，并清理启动阶段遗留的文档状态不一致问题。本轮只处理文档状态，不修改 Godot 功能代码、场景、资源、交互逻辑、物理逻辑、保存/加载逻辑或导入图片逻辑。
+
+### 准备动作
+
+- 读取 GitHub 插件说明和发布流程说明。
+- 执行 `git status -sb`：初始状态为 `## main...origin/main`。
+- 执行 `git branch --show-current`：`main`。
+- 执行 `git remote -v`：`origin` 指向 `https://github.com/Tom-20201006/virtual-antinet-box.git`。
+- 执行 `git pull --ff-only origin main`：成功，远端更新了 `docs/COMMAND_QUEUE.md`。
+- 读取 `AGENTS.md`。
+- 读取 `docs/COMMAND_QUEUE.md`。
+- 读取 `docs/PROJECT_STATE.md`。
+- 读取 `docs/MOBILE_REPORT.md`。
+- 读取 `docs/EXECUTION_LOG.md` 最近部分。
+- 读取 `docs/NEXT_REVIEW.md`、`docs/TESTING.md`、`docs/ACCEPTANCE.md`、`docs/validation.md`。
+
+### 执行范围确认
+
+只执行 `CMD-2026-06-18-001`。
+
+允许修改并实际修改：
+
+- `docs/COMMAND_QUEUE.md`
+- `docs/MOBILE_REPORT.md`
+- `docs/EXECUTION_LOG.md`
+- `docs/PROJECT_STATE.md`
+- `docs/NEXT_REVIEW.md`
+
+未修改禁止范围：
+
+- Godot 功能代码。
+- Godot 场景文件。
+- 资源文件。
+- 交互逻辑。
+- 物理逻辑。
+- 保存/加载逻辑。
+- 导入图片逻辑。
+
+### 自动检查
+
+```text
+git status -sb
+## main...origin/main
+```
+
+```text
+git remote -v
+origin  https://github.com/Tom-20201006/virtual-antinet-box.git (fetch)
+origin  https://github.com/Tom-20201006/virtual-antinet-box.git (push)
+```
+
+Godot headless：
+
+```text
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+```
+
+结果：通过。Godot 能 headless 加载项目，未出现脚本解析错误。
+
+### 文档处理结果
+
+- `docs/COMMAND_QUEUE.md`：`CMD-2026-06-18-001` 状态更新为 `DONE`；`BOOTSTRAP-2026-06-18` 过期状态更新为 `DONE / PUSHED`。
+- `docs/MOBILE_REPORT.md`：改为手机端当前状态摘要，明确自动检查通过、人工交互验收未执行。
+- `docs/PROJECT_STATE.md`：更新为第一次正式命令闭环验证已完成。
+- `docs/NEXT_REVIEW.md`：下一轮重点改为用户人工验收结果。
+- `docs/EXECUTION_LOG.md`：记录本轮执行过程。
+
+### 人工验收说明
+
+Codex 没有执行人工交互验收。Godot headless 检查只是自动预检查，不等同于功能和交互体验验收。
+
+用户仍需通过 UU 远程打开 Godot，并按 `docs/validation.md` 逐项测试抽屉、卡片、导入、保存加载、摄像机控制和最低限度数字化边界。
+
+### 未解决问题
+
+- 等待用户人工验收结果。
+
+### 下一步建议
+
+提交并 push 本轮文档更新后，iOS ChatGPT 可以读取最新文档。用户应通过 UU 远程执行 `docs/validation.md` 的人工验收。

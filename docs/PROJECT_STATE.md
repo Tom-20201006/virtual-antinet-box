@@ -1,6 +1,6 @@
 # Project State
 
-最近更新时间：2026-06-18 20:05 +08:00
+最近更新时间：2026-06-18 20:27 +08:00
 
 ## 项目名称
 
@@ -12,7 +12,7 @@ VirtualAntinetBox，中文暂名：虚拟实体卡片盒。
 
 ## 当前阶段
 
-功能性 Godot Demo 已完成首版；长期远程协作结构已建立并完成 GitHub 首次同步。
+功能性 Godot Demo 已完成首版；长期远程协作结构已建立并完成第一次正式命令闭环验证。
 
 ## 当前技术栈
 
@@ -57,6 +57,7 @@ Windows Godot 可执行文件：
 - 基础大量卡片优化策略。
 - 详细逐步验收文档 `docs/validation.md`。
 - 协作结构文档。
+- `CMD-2026-06-18-001` 文档闭环验证。
 
 ## 未完成内容
 
@@ -64,7 +65,8 @@ Windows Godot 可执行文件：
 - 大规模对象池的生产级实现。
 - 缩略图和高清贴图分层缓存。
 - 更精细模型和材质替换。
-- 后续由 iOS ChatGPT 写入正式 CMD 命令并触发 Codex 执行。
+- 用户通过 UU 远程执行 `docs/validation.md` 中的人工交互验收。
+- 后续由 iOS ChatGPT 写入新的正式 CMD 命令并触发 Codex 执行。
 
 ## 当前主要问题
 
@@ -72,13 +74,14 @@ Windows Godot 可执行文件：
 - 远程地址：`https://github.com/Tom-20201006/virtual-antinet-box.git`。
 - 本地 `main` 已成功推送到 `origin/main`。
 - 当前没有 GitHub 同步阻塞。
+- 本轮自动检查通过，但人工交互验收尚未由用户执行。
 
 ## 最近一次有效状态
 
-Godot 主场景曾通过命令行 headless 加载和 1 秒运行验证。后续功能修改仍需按 `docs/validation.md` 做人工验收。
+Godot 主场景通过命令行 headless 加载和 1 秒运行验证。该检查只说明项目能加载，不等同于用户人工交互验收。
 
 ## 下一步方向
 
-1. iOS ChatGPT 通过 GitHub 读取 `docs/COMMAND_QUEUE.md`、`docs/PROJECT_STATE.md` 和 `docs/MOBILE_REPORT.md`。
-2. iOS ChatGPT 写入第一个正式 CMD 命令。
-3. 用户通过 UU 远程触发 Codex 执行指定 CMD。
+1. 用户通过 UU 远程打开 Godot。
+2. 用户按 `docs/validation.md` 逐项进行人工交互验收。
+3. iOS ChatGPT 根据验收结果写入下一个正式 CMD 命令。
