@@ -172,5 +172,4 @@ Godot 图形模式启动校验：
 
 ### commit / push
 
-- commit：待提交。
-- push：待推送。
+- commit：已提交，实施提交 `8833eaa CMD-2026-06-20-001 rebuild physical components`。`r`n- push：已推送到 `origin/main`，范围 `7d77464..8833eaa`。本日志状态修正将作为同一 CMD 的后续文档提交推送。
