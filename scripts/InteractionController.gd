@@ -53,6 +53,8 @@ func _handle_mouse_button(event: InputEventMouseButton) -> void:
 		if dragged_object != null:
 			main.drop_interactive_object(dragged_object)
 			dragged_object = null
+		if main != null and main.card_box != null:
+			main.card_box.clear_insertion_previews()
 		dragged_drawer = null
 
 
@@ -61,6 +63,7 @@ func _handle_mouse_motion(event: InputEventMouseMotion) -> void:
 		var plane_point = _mouse_to_plane(event.position, main.get_drag_plane_y())
 		if plane_point != null:
 			dragged_object.set_drag_position(plane_point + Vector3(0.0, main.get_drag_lift_height(), 0.0))
+			main.preview_drawer_insertion(dragged_object.global_position)
 			get_viewport().set_input_as_handled()
 	elif dragged_drawer != null:
 		dragged_drawer.adjust_open_amount(event.relative.y * 0.006)
@@ -150,4 +153,3 @@ func _mouse_to_plane(screen_position: Vector2, plane_y: float) -> Variant:
 	if t < 0.0:
 		return null
 	return origin + direction * t
-

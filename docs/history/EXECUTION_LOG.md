@@ -1,4 +1,4 @@
-# Execution Log
+﻿# Execution Log
 
 本文件是新结构下的 Codex 执行历史入口。旧执行日志原文已归档到 `docs/archive/old_reports/EXECUTION_LOG.md`。
 
@@ -87,3 +87,90 @@
 
 - commit：本轮文档更新完成后执行，commit message 包含 `CMD-2026-06-19-002`。
 - push：commit 后推送到 `origin/main`；如失败将把状态改为 `BLOCKED` 并追加记录。
+
+## CMD-2026-06-20-001
+
+时间：2026-06-21 10:54 +08:00
+操作者：Codex Desktop App
+状态：DONE
+
+### 任务
+
+执行 Godot 物理组件重构：根据现实桌面、普通纸质卡片、木质 notebox、可拉抽屉、滑轨、抽屉内纸卡队列和分隔片等物体特征，重构当前 Demo 的核心实体组件。
+
+### 修改文件
+
+Godot 脚本：
+
+- `scripts/Main.gd`
+- `scripts/Card.gd`
+- `scripts/Divider.gd`
+- `scripts/CardBox.gd`
+- `scripts/Drawer.gd`
+- `scripts/InteractionController.gd`
+
+文档：
+
+- `docs/00_STATUS.md`
+- `docs/01_COMMANDS.md`
+- `docs/spec/PHYSICAL_MODEL_SPEC.md`
+- `docs/history/EXECUTION_LOG.md`
+
+### 执行结果
+
+- 桌面改为连续木质工作面，移除固定功能区视觉。
+- 卡片改为通用纸片物理对象，通过物理 profile 表达普通纸、横线纸、彩色纸、薄纸和分隔片。
+- 卡片新增纸面颜色、正反面、边缘、可见地址/编号占位、横线、墨迹、绿色链接占位和红色引用占位。
+- 木质 notebox 新增盒体、抽屉、前面板、把手、铭牌槽、内部滑轨和木纹占位。
+- 抽屉使用单轴约束滑动，并在打开后露出内部纸卡队列。
+- 抽屉内纸卡以站立/轻微倾斜队列排列，保存 `drawer_slot_index`，插回时显示插入缝隙高亮。
+- 分隔片作为更高纸片和顶部 tab 处理，不作为软件标签系统。
+- 保存状态扩展到物理 profile、横线、tab、颜色、抽屉 slot 等物理属性。
+
+### 禁止范围确认
+
+未引入 OCR、搜索、标签、自动分类、AI 摘要、知识图谱，也未建立 Main Card、Bibcard、Index Card 等功能性卡片类别。
+
+### 检查命令结果
+
+```text
+git status -sb
+## main...origin/main
+ M docs/00_STATUS.md
+ M docs/01_COMMANDS.md
+ M docs/history/EXECUTION_LOG.md
+ M docs/spec/PHYSICAL_MODEL_SPEC.md
+ M scripts/Card.gd
+ M scripts/CardBox.gd
+ M scripts/Divider.gd
+ M scripts/Drawer.gd
+ M scripts/InteractionController.gd
+ M scripts/Main.gd
+`$([Environment]::NewLine)```text
+git diff --stat
+10 files changed, 685 insertions(+), 213 deletions(-)
+`$([Environment]::NewLine)```text
+git diff --check
+通过；无尾随空格或 EOF 格式错误。
+`$([Environment]::NewLine)Godot headless：
+
+```powershell
+& 'D:\Godot\Godot_v4.6.3-stable_win64_console.exe' --headless --path 'D:\codex project\VirtualAntinetBox\project\virtual-antinet-box' --quit
+`$([Environment]::NewLine)结果：通过，退出码 0，无脚本编译错误输出。
+
+Godot 图形模式启动校验：
+
+`powershell
+& 'D:\Godot\Godot_v4.6.3-stable_win64_console.exe' --path 'D:\codex project\VirtualAntinetBox\project\virtual-antinet-box' --quit
+`
+
+结果：通过，退出码 0，D3D12 / NVIDIA GeForce RTX 5060 Laptop GPU 初始化正常。
+
+### 人工验收
+
+本轮自动检查不能替代人工可视交互验收。用户下一步应通过 UU 远程打开 Godot 主场景，按 `docs/spec/PHYSICAL_MODEL_SPEC.md` 的“人工验收清单”检查连续桌面、木质 notebox、抽屉滑动、纸卡队列、抽卡、旋转、翻面、插回缝隙和禁用语义功能入口。
+
+### commit / push
+
+- commit：待提交。
+- push：待推送。

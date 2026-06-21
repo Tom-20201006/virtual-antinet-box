@@ -1,8 +1,8 @@
 ﻿extends Node3D
 
-const DESK_SIZE := Vector3(1.65, 0.06, 1.05)
+const DESK_SIZE := Vector3(1.90, 0.07, 1.25)
 const DESK_TOP_Y := DESK_SIZE.y * 0.5
-const DRAG_LIFT_HEIGHT := 0.075
+const DRAG_LIFT_HEIGHT := 0.095
 
 const CardScript := preload("res://scripts/Card.gd")
 const DividerScript := preload("res://scripts/Divider.gd")
@@ -33,7 +33,7 @@ func _ready() -> void:
 	_build_controllers()
 	if not load_world(false):
 		_spawn_default_demo_contents()
-	update_status("Ready")
+	update_status("Ready: physical notebox workspace")
 
 
 func get_drag_plane_y() -> float:
@@ -50,6 +50,8 @@ func begin_drag_object(object: Node) -> void:
 	if object.get_parent() != cards_root:
 		object.reparent(cards_root, true)
 	object.area_id = "desk"
+	if object.has_method("align_for_desk"):
+		object.align_for_desk()
 	object.begin_drag()
 	physics_sleep_manager.mark_active(object)
 	physics_sleep_manager.freeze_all_idle(object)
@@ -58,48 +60,63 @@ func begin_drag_object(object: Node) -> void:
 func drop_interactive_object(object: Node) -> void:
 	if object == null:
 		return
+	card_box.clear_insertion_previews()
 	var drawer = _drawer_under_point(object.global_position)
 	if drawer != null:
-		drawer.add_item(object)
-		update_status("%s placed in %s" % [object.object_id, drawer.drawer_id])
+		drawer.add_item(object, object.global_position)
+		update_status("%s inserted into %s paper queue" % [object.object_id, drawer.drawer_id])
 	else:
 		if object.get_parent() != cards_root:
 			object.reparent(cards_root, true)
 		object.area_id = "desk"
+		if object.has_method("align_for_desk"):
+			object.align_for_desk()
 		var position = object.global_position
 		position.y = DESK_TOP_Y + object.card_size.y * 0.5 + _desk_stack_offset(object, position)
 		object.global_position = position
 		object.end_drag()
-		update_status("%s placed on desk" % object.object_id)
+		update_status("%s placed on continuous desk" % object.object_id)
 	physics_sleep_manager.mark_sleeping(object)
 
 
+func preview_drawer_insertion(point: Vector3) -> void:
+	var active_drawer = _drawer_under_point(point)
+	for drawer in card_box.drawers:
+		if drawer == active_drawer:
+			drawer.preview_insertion_at_world_point(point)
+		else:
+			drawer.clear_insertion_preview()
+
+
 func create_imported_card(front_path: String):
-	var card = create_card(front_path, "", "")
-	card.global_position = Vector3(0.55, DESK_TOP_Y + card.card_size.y * 0.5, 0.26)
-	card.area_id = "import_area"
+	var card = create_card(front_path, "", "", "plain_paper")
+	card.global_position = Vector3(0.48, DESK_TOP_Y + card.card_size.y * 0.5, 0.28)
+	card.area_id = "desk"
 	interaction_controller.select_object(card)
-	update_status("Imported card created")
+	update_status("Imported image became a paper card surface")
 	return card
 
 
-func create_card(front_path: String = "", back_path: String = "", requested_id: String = ""):
+func create_card(front_path: String = "", back_path: String = "", requested_id: String = "", physical_profile: String = "plain_paper"):
 	var card = CardScript.new()
 	card.object_id = requested_id if not requested_id.is_empty() else "card_%03d" % _next_card_number
 	_next_card_number += 1
 	card.name = card.object_id
 	card.front_image_path = front_path
 	card.back_image_path = back_path
+	card.apply_physical_profile(physical_profile)
 	cards_root.add_child(card)
 	physics_sleep_manager.register_interactive(card)
 	return card
 
 
-func create_divider(requested_id: String = ""):
+func create_divider(requested_id: String = "", tab_label: String = ""):
 	var divider = DividerScript.new()
 	divider.object_id = requested_id if not requested_id.is_empty() else "divider_%03d" % _next_divider_number
 	_next_divider_number += 1
 	divider.name = divider.object_id
+	if not tab_label.is_empty():
+		divider.tab_label = tab_label
 	cards_root.add_child(divider)
 	physics_sleep_manager.register_interactive(divider)
 	return divider
@@ -133,7 +150,7 @@ func update_status_for_selection(object: Node) -> void:
 	elif _is_drawer(object):
 		update_status("Selected: %s  open %.0f%%" % [object.drawer_id, object.open_amount * 100.0])
 	elif _is_card_like(object):
-		update_status("Selected: %s  area %s" % [object.object_id, object.area_id])
+		update_status("Selected: %s  area %s  profile %s" % [object.object_id, object.area_id, object.physical_profile])
 	else:
 		update_status("Selected: %s" % object.name)
 
@@ -165,7 +182,7 @@ func get_world_state_data() -> Dictionary:
 			"open_amount": drawer.get_saved_open_amount()
 		})
 	return {
-		"version": 1,
+		"version": 2,
 		"principle": "physical_state_and_resource_paths_only",
 		"cards": card_states,
 		"drawers": drawer_states
@@ -182,20 +199,21 @@ func apply_world_state_data(data: Dictionary) -> void:
 		var kind = str(card_data.get("kind", "card"))
 		var item
 		if kind == "divider":
-			item = create_divider(str(card_data.get("id", "")))
+			item = create_divider(str(card_data.get("id", "")), str(card_data.get("tab_label", "")))
 		else:
-			item = create_card(str(card_data.get("front_image_path", "")), str(card_data.get("back_image_path", "")), str(card_data.get("id", "")))
+			item = create_card(str(card_data.get("front_image_path", "")), str(card_data.get("back_image_path", "")), str(card_data.get("id", "")), str(card_data.get("physical_profile", "plain_paper")))
 		item.apply_state(card_data)
-		var saved_position = _array_to_vector(card_data.get("position", []), item.global_position)
-		var saved_rotation = _array_to_vector(card_data.get("rotation", []), item.rotation)
-		item.global_position = saved_position
-		item.global_transform.basis = Basis.from_euler(saved_rotation)
 		var area = str(card_data.get("area_id", "desk"))
 		var drawer = card_box.get_drawer_by_id(area)
 		if drawer != null:
-			item.reparent(drawer.contents_root, true)
-			item.area_id = area
-	update_status("Loaded %d items" % _get_all_card_like_nodes().size())
+			drawer.add_loaded_item(item, int(card_data.get("drawer_slot_index", drawer.get_item_count())))
+		else:
+			item.area_id = "desk"
+			var saved_position = _array_to_vector(card_data.get("position", []), item.global_position)
+			var saved_rotation = _array_to_vector(card_data.get("rotation", []), item.rotation)
+			item.global_position = saved_position
+			item.global_transform.basis = Basis.from_euler(saved_rotation)
+	update_status("Loaded %d physical paper items" % _get_all_card_like_nodes().size())
 
 
 func _ensure_runtime_dirs() -> void:
@@ -207,39 +225,45 @@ func _build_environment() -> void:
 	world_environment.name = "WorldEnvironment"
 	var environment = Environment.new()
 	environment.background_mode = Environment.BG_COLOR
-	environment.background_color = Color(0.63, 0.68, 0.72, 1.0)
+	environment.background_color = Color(0.58, 0.63, 0.66, 1.0)
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = Color(0.85, 0.86, 0.88, 1.0)
-	environment.ambient_light_energy = 0.75
+	environment.ambient_light_color = Color(0.86, 0.84, 0.78, 1.0)
+	environment.ambient_light_energy = 0.72
 	world_environment.environment = environment
 	add_child(world_environment)
 
 	var light = DirectionalLight3D.new()
 	light.name = "DirectionalLight3D"
 	light.rotation_degrees = Vector3(-55.0, 35.0, 0.0)
-	light.light_energy = 2.0
+	light.light_energy = 2.1
 	add_child(light)
 
 	_build_desk()
 
 	cards_root = Node3D.new()
-	cards_root.name = "CardsRoot"
+	cards_root.name = "LooseDeskPapers"
 	add_child(cards_root)
 
 	card_box = CardBoxScript.new()
-	card_box.name = "CardBox"
-	card_box.position = Vector3(-0.45, DESK_TOP_Y, -0.08)
+	card_box.name = "WoodenNotebox"
+	card_box.position = Vector3(-0.44, DESK_TOP_Y, -0.10)
 	add_child(card_box)
 
 
 func _build_desk() -> void:
 	var desk = Node3D.new()
-	desk.name = "Desk"
+	desk.name = "ContinuousWoodDesk"
 	add_child(desk)
-	_add_box(desk, "DeskTop", Vector3.ZERO, DESK_SIZE, Color(0.55, 0.48, 0.39, 1.0), true)
-	_add_zone(desk, "CardBoxZone", Vector3(-0.45, DESK_TOP_Y + 0.0015, -0.08), Vector2(0.48, 0.48), Color(0.16, 0.28, 0.44, 0.30))
-	_add_zone(desk, "WorkSpreadZone", Vector3(0.20, DESK_TOP_Y + 0.0018, -0.10), Vector2(0.62, 0.58), Color(0.18, 0.48, 0.30, 0.24))
-	_add_zone(desk, "ImportLandingZone", Vector3(0.55, DESK_TOP_Y + 0.002, 0.27), Vector2(0.32, 0.25), Color(0.62, 0.46, 0.16, 0.26))
+	_add_box(desk, "SingleContinuousDeskTop", Vector3.ZERO, DESK_SIZE, Color(0.52, 0.40, 0.28, 1.0), true)
+	_add_box(desk, "FrontDeskEdge", Vector3(0.0, DESK_TOP_Y + 0.004, DESK_SIZE.z * 0.5 + 0.010), Vector3(DESK_SIZE.x, 0.018, 0.020), Color(0.38, 0.27, 0.17, 1.0), false)
+	_add_box(desk, "BackDeskEdge", Vector3(0.0, DESK_TOP_Y + 0.004, -DESK_SIZE.z * 0.5 - 0.010), Vector3(DESK_SIZE.x, 0.018, 0.020), Color(0.38, 0.27, 0.17, 1.0), false)
+	for index in range(11):
+		var z = -DESK_SIZE.z * 0.43 + index * DESK_SIZE.z * 0.086
+		_add_box(desk, "DeskWoodGrain%d" % index, Vector3(0.0, DESK_TOP_Y + 0.002 + index * 0.00003, z), Vector3(DESK_SIZE.x * 0.86, 0.001, 0.003), Color(0.27, 0.19, 0.12, 0.55), false)
+	var leg_size = Vector3(0.055, 0.36, 0.055)
+	for x in [-DESK_SIZE.x * 0.43, DESK_SIZE.x * 0.43]:
+		for z in [-DESK_SIZE.z * 0.40, DESK_SIZE.z * 0.40]:
+			_add_box(desk, "DeskLeg", Vector3(x, -0.19, z), leg_size, Color(0.34, 0.24, 0.15, 1.0), false)
 
 
 func _build_ui() -> void:
@@ -251,7 +275,7 @@ func _build_ui() -> void:
 	panel.name = "StatusPanel"
 	panel.offset_left = 12.0
 	panel.offset_top = 12.0
-	panel.offset_right = 510.0
+	panel.offset_right = 560.0
 	panel.offset_bottom = 86.0
 	ui.add_child(panel)
 
@@ -267,12 +291,12 @@ func _build_ui() -> void:
 
 	var buttons = HBoxContainer.new()
 	rows.add_child(buttons)
-	_add_button(buttons, "瀵煎叆", _on_import_pressed)
-	_add_button(buttons, "淇濆瓨", _on_save_pressed)
-	_add_button(buttons, "杞藉叆", _on_load_pressed)
-	_add_button(buttons, "鎬昏", _on_overview_pressed)
-	_add_button(buttons, "鎶藉眽", _on_drawer_view_pressed)
-	_add_button(buttons, "鑱氱劍", _on_focus_pressed)
+	_add_button(buttons, "Import", _on_import_pressed)
+	_add_button(buttons, "Save", _on_save_pressed)
+	_add_button(buttons, "Load", _on_load_pressed)
+	_add_button(buttons, "Overview", _on_overview_pressed)
+	_add_button(buttons, "Drawer", _on_drawer_view_pressed)
+	_add_button(buttons, "Focus", _on_focus_pressed)
 
 	status_label = Label.new()
 	status_label.name = "StatusLabel"
@@ -313,22 +337,34 @@ func _build_controllers() -> void:
 
 
 func _spawn_default_demo_contents() -> void:
-	card_box.drawers[0].set_open_amount(0.68)
-	card_box.drawers[1].set_open_amount(0.30)
+	card_box.drawers[0].set_open_amount(0.82)
+	card_box.drawers[1].set_open_amount(0.38)
 	card_box.drawers[2].set_open_amount(0.0)
 
-	var first = create_card()
-	first.global_position = Vector3(0.22, DESK_TOP_Y + first.card_size.y * 0.5, -0.26)
-	first.rotation_degrees.y = -8.0
+	var desk_card = create_card("", "", "", "ruled_paper")
+	desk_card.global_position = Vector3(0.24, DESK_TOP_Y + desk_card.card_size.y * 0.5, -0.24)
+	desk_card.rotation_degrees.y = -8.0
 
-	var second = create_card()
-	card_box.drawers[0].add_item(second)
+	var loose_plain = create_card("", "", "", "thin_plain_paper")
+	loose_plain.global_position = Vector3(0.43, DESK_TOP_Y + loose_plain.card_size.y * 0.5 + 0.004, -0.12)
+	loose_plain.rotation_degrees.y = 9.0
 
-	var third = create_card()
-	card_box.drawers[0].add_item(third)
+	var profiles = ["plain_paper", "ruled_paper", "thin_plain_paper", "colored_paper", "plain_paper", "ruled_paper"]
+	for profile in profiles:
+		var card = create_card("", "", "", profile)
+		card_box.drawers[0].add_item(card)
 
-	var divider = create_divider()
-	card_box.drawers[1].add_item(divider)
+	var divider = create_divider("", "A")
+	card_box.drawers[0].add_item(divider)
+
+	for profile in ["thin_plain_paper", "ruled_paper", "colored_paper"]:
+		var card_after_divider = create_card("", "", "", profile)
+		card_box.drawers[0].add_item(card_after_divider)
+
+	var second_divider = create_divider("", "B")
+	card_box.drawers[1].add_item(second_divider)
+	for profile in ["plain_paper", "ruled_paper", "plain_paper"]:
+		card_box.drawers[1].add_item(create_card("", "", "", profile))
 
 
 func _drawer_under_point(point: Vector3):
@@ -402,18 +438,6 @@ func _add_box(parent: Node, box_name: String, box_position: Vector3, box_size: V
 	return mesh_instance
 
 
-func _add_zone(parent: Node, zone_name: String, zone_position: Vector3, zone_size: Vector2, color: Color) -> void:
-	var zone = MeshInstance3D.new()
-	zone.name = zone_name
-	var plane = PlaneMesh.new()
-	plane.size = zone_size
-	zone.mesh = plane
-	zone.position = zone_position
-	zone.material_override = _transparent_material(color)
-	zone.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	parent.add_child(zone)
-
-
 func _add_button(parent: Node, label: String, callback: Callable) -> void:
 	var button = Button.new()
 	button.text = label
@@ -424,16 +448,10 @@ func _add_button(parent: Node, label: String, callback: Callable) -> void:
 func _material(color: Color) -> StandardMaterial3D:
 	var mat = StandardMaterial3D.new()
 	mat.albedo_color = color
-	mat.roughness = 0.86
-	return mat
-
-
-func _transparent_material(color: Color) -> StandardMaterial3D:
-	var mat = StandardMaterial3D.new()
-	mat.albedo_color = color
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat.roughness = 0.88
+	if color.a < 1.0:
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	return mat
 
 
@@ -465,4 +483,3 @@ func _on_drawer_view_pressed() -> void:
 
 func _on_focus_pressed() -> void:
 	set_camera_view("focus")
-
